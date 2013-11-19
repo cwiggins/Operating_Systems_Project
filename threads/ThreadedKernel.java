@@ -15,7 +15,7 @@ public class ThreadedKernel extends Kernel {
 
     /**
      * Initialize this kernel. Creates a scheduler, the first thread, and an
-     * alarm, and enables interrupts. Creates a file system if necessary.   
+     * alarm, and enables interrupts. Creates a file system if necessary.
      */
     public void initialize(String[] args) {
 	// set scheduler
@@ -44,16 +44,17 @@ public class ThreadedKernel extends Kernel {
      * <tt>SynchList</tt>, and <tt>ElevatorBank</tt> classes. Note that the
      * autograder never calls this method, so it is safe to put additional
      * tests here.
-     */	
+     */
     public void selfTest() {
 	KThread.selfTest();
 	Semaphore.selfTest();
 	SynchList.selfTest();
+	Communicator.selfTest();
 	if (Machine.bank() != null) {
 	    ElevatorBank.selfTest();
 	}
     }
-    
+
     /**
      * A threaded kernel does not run user programs, so this method does
      * nothing.
