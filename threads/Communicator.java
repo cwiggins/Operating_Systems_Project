@@ -114,6 +114,8 @@ public class Communicator {
 		listen.fork();
 		speak.join(); listen.join();
 
+		//testing to see if all speaker and listener threads exit properly.
+		//Waiting Listeners should be 0 at the end.
 		for(int i = 0; i < 10; i++){
 			new KThread(new Runnable(){
 				public void run(){
@@ -125,7 +127,7 @@ public class Communicator {
 		for(int i = 0; i < 10; i++){
 			speak = new KThread(new Runnable(){
 				public void run(){
-					com.speak(10);
+					com.speak(1);
 				}
 			});
 			speak.fork();
