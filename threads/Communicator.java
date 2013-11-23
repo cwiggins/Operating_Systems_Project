@@ -52,14 +52,15 @@ public class Communicator {
 		commlock.acquire();
 
 		listenersWaiting++;
+		Lib.debug(dbgCommunicator, "Waiting Listeners " + listenersWaiting);
 		speaker.wake();
 		listener.sleep();
 
 		int word = sharedWord;
 		sharedWordInUse = false;
 		listenersWaiting--;
+		Lib.debug(dbgCommunicator, "Waiting Listeners " + listenersWaiting);
 
-		speaker.wake();
 		commlock.release();
 
 
@@ -92,7 +93,7 @@ public class Communicator {
 		listen.join(); speak.join();
 
 		//test that speaker blocks waiting for a listener
-
+		
 		speak = new KThread (new Runnable(){
 			public void run(){
 			com.speak(10);
@@ -112,28 +113,33 @@ public class Communicator {
 		Lib.debug(dbgCommunicator, "Waiting listener "  + com.listenersWaiting);
 
 		listen.fork();
-		speak.join(); listen.join();
+		speak.join(); 
+		listen.join();
 
 		//testing to see if all speaker and listener threads exit properly.
 		//Waiting Listeners should be 0 at the end.
-		for(int i = 0; i < 10; i++){
-			new KThread(new Runnable(){
+		for(int i = 0; i < 5; i++){
+			listen = new KThread(new Runnable(){
 				public void run(){
 					com.listen();
 				}
-			}).fork();
+			});
+			listen.fork();
+			//Lib.debug(dbgCommunicator, "Waiting Listeners " + com.listenersWaiting);
 		}
-
-		for(int i = 0; i < 10; i++){
-			speak = new KThread(new Runnable(){
+		//spawns speaker threads to pair off with listener threads
+		for(int i = 0; i < 5; i++){
+			KThread speaker = new KThread(new Runnable(){
 				public void run(){
-					com.speak(1);
+					com.speak(0);
 				}
 			});
-			speak.fork();
-			Lib.debug(dbgCommunicator, "Waiting Listeners " + com.listenersWaiting);
-			speak.join();
+			speaker.fork();
+			//Lib.debug(dbgCommunicator, "Waiting Listeners " + com.listenersWaiting);
+			listen.join();
+			speaker.join();
 		}
+		
 
 		Lib.debug(dbgCommunicator, (com.listenersWaiting == 0 ? "Pass" : "Fail"));
 	}
