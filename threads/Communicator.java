@@ -142,6 +142,29 @@ public class Communicator {
 		
 
 		Lib.debug(dbgCommunicator, (com.listenersWaiting == 0 ? "Pass" : "Fail"));
+		
+		int sum;
+		
+		speak = new KThread(new Runnable(){
+			public void run(){
+				com.speak(9);
+			}
+		});
+		
+		KThread speak2 = new KThread(new Runnable(){
+			public void run(){
+				com.speak(9);
+			}
+		});
+		
+		for(int i = 0; i < 2 ; i++){
+			new KThread(new Runnable(){
+				public void run(){
+					sum += com.listen();
+				}
+			});
+		}
+		Lib.debug(dbgCommunicator, (sum == 18 ? "Pass" : "Fail") + "No overwriting happened.");
 	}
 	private static final char dbgCommunicator = 'c';
 
