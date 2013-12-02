@@ -1,6 +1,7 @@
 package nachos.threads;
 
 import nachos.machine.*;
+import java.util.Random;
 
 /**
  * A <i>communicator</i> allows threads to synchronously exchange 32-bit
@@ -93,7 +94,7 @@ public class Communicator {
 		listen.join(); speak.join();
 
 		//test that speaker blocks waiting for a listener
-		
+
 		speak = new KThread (new Runnable(){
 			public void run(){
 			com.speak(10);
@@ -113,7 +114,7 @@ public class Communicator {
 		Lib.debug(dbgCommunicator, "Waiting listener "  + com.listenersWaiting);
 
 		listen.fork();
-		speak.join(); 
+		speak.join();
 		listen.join();
 
 		//testing to see if all speaker and listener threads exit properly.
@@ -139,32 +140,56 @@ public class Communicator {
 			listen.join();
 			speaker.join();
 		}
-		
+
 
 		Lib.debug(dbgCommunicator, (com.listenersWaiting == 0 ? "Pass" : "Fail"));
-		
+
 		int sum;
-		
+
 		speak = new KThread(new Runnable(){
 			public void run(){
 				com.speak(9);
 			}
 		});
-		
+
 		KThread speak2 = new KThread(new Runnable(){
 			public void run(){
 				com.speak(9);
 			}
 		});
-		
+
 		for(int i = 0; i < 2 ; i++){
 			new KThread(new Runnable(){
 				public void run(){
-					sum += com.listen();
+					com.listen();
 				}
 			});
 		}
-		Lib.debug(dbgCommunicator, (sum == 18 ? "Pass" : "Fail") + "No overwriting happened.");
+		//Lib.debug(dbgCommunicator, (sum == 18 ? "Pass" : "Fail") + "No overwriting happened.");
+
+
+
+		speak = new KThread(new Runnable(){
+			public void run(){
+		        Random generator = new Random();
+				int random = generator.nextInt();
+				com.speak(random);
+			}
+		});
+
+		listen = new KThread(new Runnable(){
+			public void run(){
+				int word = com.listen();
+				Lib.debug(dbgCommunicator, (word > 0 ? "Pass" : "Fail") + " Successful Transfer.");
+			}
+		});
+
+		speak.fork();
+		listen.fork();
+		speak.join();
+		listen.join();
+
+
 	}
 	private static final char dbgCommunicator = 'c';
 
